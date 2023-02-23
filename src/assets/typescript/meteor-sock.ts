@@ -14,31 +14,4 @@ meteorServerSock.on('connected', () => console.info('Successfully connected to M
 meteorServerSock.on('disconnected', () => console.warn('Lost connection to Meteor!'));
 meteorServerSock.on('error', (e: Error) => console.error('Encountered an error with connection to Meteor DDP!', e));
 
-
-
-let password = "dbg1DBG!";
-let username = "dbg";
-
-// try {
-//   await meteorServerSock.login({resume:token});
-// } catch (e) {
-//   // failed auth by token
-// }
-
-// you must pass password and at least one of username or email
-let userAuth = await meteorServerSock.login({
-  password,
-  user: {
-      username
-  }
-});
-
-
-console.log(userAuth);
-console.log(meteorServerSock.userId);
-console.log(meteorServerSock.token);
-
-await meteorServerSock.logout();
-
-
 export default meteorServerSock;
