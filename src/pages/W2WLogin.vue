@@ -1,26 +1,43 @@
 <template>
-  <div class="form-group">
-    <label for="username">Username:</label>
-    <input type="text"
-           id="username"
-           v-model="username"
-           :disabled="loggedIn">
-    <br>
-    <label for="password">Password:</label>
-    <input type="password"
-           id="password"
-           v-model.lazy="password"
-           :disabled="loggedIn">
-    <br>
-    <button v-if="loggedIn" @click="logout()">Logout</button>
-    <button v-else @click="login()">Login</button>
-    <h1 v-if="loggedIn">You Are LoggedIn</h1>
-  </div>
+  <q-page class="row items-center justify-evenly">
+
+    <q-form v-if="!loggedIn" @submit="login">
+          <q-input
+            filled
+            v-model="username"
+            label="Username"
+            lazy-rules
+            :rules="[ val => !!val || 'Please enter your username' ]"
+          />
+          <q-input
+            filled
+            v-model.lazy="password"
+            label="Password"
+            type="password"
+            lazy-rules
+            :rules="[ val => !!val || 'Please enter your password' ]"
+          />
+          <q-btn
+            type="submit"
+            color="primary"
+            class="full-width"
+            :loading="isLoading"
+          >
+            Login
+          </q-btn>
+    </q-form>
+    <q-btn v-else 
+            color="primary"
+            @click="logout()">
+      Logout
+    </q-btn>
+  </q-page>
+
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import meteorServerSock from "@/assets/typescript/meteor-sock";
+import { ref } from 'vue';
+import meteorServerSock from '../assets/typescript/meteor-sock';
 
 const username = ref('');
 const password = ref('');
@@ -28,6 +45,7 @@ const password = ref('');
 let what2watchlistToken = 'w2w-token';
 
 const loggedIn = ref(false);
+const isLoading = ref(false);
 
 let token = localStorage.getItem(what2watchlistToken);
 if(meteorServerSock.token){

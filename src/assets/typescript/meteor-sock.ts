@@ -3,8 +3,8 @@ import { simpleDDPLogin } from 'simpleddp-plugin-login';
 import ws from 'isomorphic-ws';
 
 
-let opts = {
-  endpoint: "ws://localhost:3000/websocket",
+const opts = {
+  endpoint: 'ws://localhost:3000/websocket',
   SocketConstructor: ws,
   reconnectInterval: 5000
 };
