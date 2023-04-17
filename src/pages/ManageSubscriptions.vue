@@ -4,21 +4,21 @@
 
       <q-item-label header>What to Watchlist prefered subscriptions</q-item-label>
 
-      <template v-for="(sub, index) in storeSubscriptions.userSubscriptions" :key="index">
+      <template v-for="(sub, index) in storeSubscriptions.userSubscriptions" :key="sub.service_id">
         <q-separator v-if="0==index"/>
         <q-separator v-else spaced inset="item" />
 
         <q-item>
           <q-item-section top avatar>
             <q-avatar rounded>
-              <img :src="sub.icon">
+              <img :src="sub.logo">
             </q-avatar>
           </q-item-section>
 
           <q-item-section>
-            <q-item-label>{{sub.service}}</q-item-label>
+            <q-item-label>{{sub.service_name}}</q-item-label>
             <q-item-label caption>
-              {{sub.plan}} plan
+              {{sub.plan}} plan  {{ sub.service_id }}
               <div v-if="sub.card">
                 Linked Payment Card
                 <br/>
@@ -88,7 +88,7 @@
 
         <q-card-actions align="right" class="text-primary">
           <q-btn flat label="Cancel" v-close-popup />
-          <q-btn flat label="Link Card" v-close-popup />
+          <q-btn flat label="Link Card" @click="storeSubscriptions.refresh()" v-close-popup />
         </q-card-actions>
       </q-card>
     </q-dialog>
