@@ -2,7 +2,15 @@
   <q-page class="row items-center justify-evenly">
     <q-list bordered padding>
 
-      <q-item-label header>What to Watchlist prefered subscriptions</q-item-label>
+      <q-item-label header class="q-py-sm">
+        What to Watchlist prefered subscriptions
+        <q-icon
+          :name="matRefresh"
+          class="float-right"
+          size="sm"
+          @click="storeSubscriptions.refresh()"
+        />
+      </q-item-label>
 
       <template v-for="(sub, index) in storeSubscriptions.userSubscriptions" :key="sub.service_id">
         <q-separator v-if="0==index"/>
@@ -97,13 +105,19 @@
 </template>
 
 <script setup lang="ts">
-import { matCreditCard, matAdd } from '@quasar/extras/material-icons';
-import { ref } from 'vue';
+import { matCreditCard, matAdd, matRefresh } from '@quasar/extras/material-icons';
+import { ref, onMounted } from 'vue';
 import { useUserSubscriptions } from '../stores/user-subscriptions';
 
 const prompt = ref(false);
 const selectCard = ref<string | null>(null);
 const storeSubscriptions = useUserSubscriptions();
+
+onMounted(() => {
+  if(!storeSubscriptions.userSubscriptions.length){
+    storeSubscriptions.refresh();
+  }
+});
 </script>
 
 <style lang="sass">
