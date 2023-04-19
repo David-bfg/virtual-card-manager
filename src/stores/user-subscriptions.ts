@@ -12,22 +12,15 @@ interface sub {
 }
 
 export const useUserSubscriptions = defineStore('user-subscriptions', () => {
-  const userSubscriptions = ref<Array<sub>>([
-    {logo:'https://image.tmdb.org/t/p/original/t2yyOv40HZeVlLjYsCsPHnWLk4W.jpg',
-    service_name: 'Awesome Flix', plan: 'basic', price: 100, service_id: '1'},
-    {logo:'https://image.tmdb.org/t/p/original/t2yyOv40HZeVlLjYsCsPHnWLk4W.jpg',
-    service_name: 'Awesome Flix1', plan: 'HD', price: 900, service_id: '2'},
-    {logo:'https://image.tmdb.org/t/p/original/t2yyOv40HZeVlLjYsCsPHnWLk4W.jpg',
-    service_name: 'Awesome Flix2', plan: '4K', price: 1400, service_id: '3'},
-    {logo:'https://image.tmdb.org/t/p/original/t2yyOv40HZeVlLjYsCsPHnWLk4W.jpg',
-    service_name: 'Awesome Flix3', plan: 'Family', price: 10000, card: true,
-    service_id: '4'},
-  ]);
+  const userSubscriptions = ref<Array<sub>>([]);
 
   async function refresh() {
-    const streamManager = await meteorServerSock.call('subscription.details');
-    console.log(streamManager)
-    userSubscriptions.value = streamManager;
+    if(meteorServerSock.userId){
+      const streamManager = await meteorServerSock.call('subscription.details');
+      userSubscriptions.value = streamManager;
+    } else {
+      userSubscriptions.value = [];
+    }
   }
   return { userSubscriptions, refresh };
 });
