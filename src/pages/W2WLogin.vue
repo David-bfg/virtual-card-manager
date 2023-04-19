@@ -28,7 +28,8 @@
     </q-form>
     <q-btn v-else 
             color="primary"
-            @click="logout()">
+            @click="logout()"
+            :loading="isLoading">
       Logout
     </q-btn>
   </q-page>
@@ -36,7 +37,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import meteorServerSock from '../assets/typescript/meteor-sock';
 
 const username = ref('');
@@ -47,29 +48,55 @@ let what2watchlistToken = 'w2w-token';
 const loggedIn = ref(false);
 const isLoading = ref(false);
 
-let token = localStorage.getItem(what2watchlistToken);
-if(meteorServerSock.token){
-  loggedIn.value = !!meteorServerSock.userId;
-} else if (token) {
-  meteorServerSock.login({resume:token}).then(
-    () => loggedIn.value = !!meteorServerSock.userId
-  ).catch((e: Error) => {
-    console.error('Stored login token failed.' +
-        ' Unable to re-initiate login.', e)
-  });
-  
-}
+interface event { stop: () => void; }
+let loginEvent: event, logoutEvent: event, loginSessionLostEvent:
+    event, loginResumeEvent: event;
+onMounted(() => {
 
+  if(meteorServerSock.token){ 
+    loggedIn.value = !!meteorServerSock.userId;
+  }
+
+  loginEvent = meteorServerSock.on('login',()=>{
+    loggedIn.value = true;
+    console.log('User logged in');
+  });
+
+  logoutEvent = meteorServerSock.on('logout',()=>{
+    loggedIn.value = false;
+    console.log('User logged out');
+  });
+
+  loginSessionLostEvent = meteorServerSock.on('loginSessionLost',()=>{
+    loggedIn.value = false;
+    console.log('User lost connection to server, will auto resume ' +
+        'by default with token');
+  });
+
+  loginResumeEvent = meteorServerSock.on('loginResume',()=>{
+    loggedIn.value = true;
+    console.log('User resumed (logged in by token)');
+  });
+
+});
+
+onUnmounted(() => {
+  loginEvent.stop();
+  logoutEvent.stop();
+  loginSessionLostEvent.stop();
+  loginResumeEvent.stop();
+});
 
 function logout() {
+  isLoading.value = true;
   meteorServerSock.logout().then(() => {
-    loggedIn.value = false;
     localStorage.removeItem(what2watchlistToken);
-  });
+  }).finally(() => isLoading.value = false);
 
 }
 
 function login() {
+  isLoading.value = true;
   meteorServerSock.login({
     password: password.value,
     user: {
@@ -77,12 +104,11 @@ function login() {
     }
   }).then((userAuth: {id:string, token:string, tokenExpires:Date,
         type:string}) => {
-    loggedIn.value = !!userAuth.id;
     if (userAuth) {
       localStorage.setItem(what2watchlistToken, userAuth.token);
     }
   }).catch((e: Error) => {
     console.error('Login failed.', e.message)
-  });
+  }).finally(() => isLoading.value = false);
 }
 </script>
