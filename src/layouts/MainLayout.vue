@@ -9,21 +9,16 @@
           </q-avatar>
           Sub-Troll
         </q-toolbar-title>
-
-        <!-- <q-btn dense flat round icon="menu" @click="toggleRightDrawer" /> -->
       </q-toolbar>
 
       <q-tabs align="left">
         <q-route-tab to="/login" label="Login" />
+        <!-- TODO: disable subscriptions if not logged in -->
         <q-route-tab to="/subscriptions" label="Subscriptions" />
         <q-route-tab to="/cards" label="Virtual Cards" />
         <q-route-tab to="/" label="Lithic-API" />
       </q-tabs>
     </q-header>
-
-    <q-drawer v-model="rightDrawerOpen" side="right" overlay bordered>
-      <!-- drawer content -->
-    </q-drawer>
 
     <q-page-container>
       <router-view />
@@ -39,13 +34,3 @@
 
   </q-layout>
 </template>
-
-<script setup lang="ts">
-import { ref } from 'vue';
-
-const rightDrawerOpen = ref(false);
-
-function toggleRightDrawer () {
-  rightDrawerOpen.value = !rightDrawerOpen.value;
-}
-</script>
