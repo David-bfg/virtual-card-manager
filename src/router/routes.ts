@@ -11,8 +11,9 @@ const routes: RouteRecordRaw[] = [
     component: () => import('layouts/MainLayout.vue'),
     children: [
       { path: 'login', component: () => import('src/pages/W2WLogin.vue') },
-      { path: 'Subscriptions', component: () => import('src/pages/ManageSubscriptions.vue') },
+      { path: 'subscriptions', component: () => import('src/pages/ManageSubscriptions.vue') },
       { path: 'cards', component: () => import('src/pages/VirtualCards.vue') },
+      { path: 'lithic', component: () => import('src/pages/LithicAPI.vue') },
     ],
   },
 

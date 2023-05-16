@@ -16,7 +16,7 @@
         <!-- TODO: disable subscriptions if not logged in -->
         <q-route-tab to="/subscriptions" label="Subscriptions" />
         <q-route-tab to="/cards" label="Virtual Cards" />
-        <q-route-tab to="/" label="Lithic-API" />
+        <q-route-tab to="/lithic" label="Lithic-API" />
       </q-tabs>
     </q-header>
 
