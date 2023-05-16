@@ -6,7 +6,7 @@
         What to Watchlist prefered subscriptions
         <q-icon
           :name="matRefresh"
-          class="float-right"
+          class="float-right cursor-pointer"
           size="sm"
           @click="storeSubscriptions.refresh()"
         />

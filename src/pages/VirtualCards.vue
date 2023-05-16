@@ -6,7 +6,7 @@
         Virtual Cards
         <q-icon
           :name="matRefresh"
-          class="float-right"
+          class="float-right cursor-pointer"
           size="sm"
           @click="storeCards.refresh()"
         />
