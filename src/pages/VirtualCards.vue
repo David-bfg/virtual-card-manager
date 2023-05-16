@@ -2,17 +2,21 @@
   <q-page class="row items-center justify-evenly">
     <q-list bordered padding>
 
-      <q-item-label header>Virtual Cards</q-item-label>
+      <q-item-label header class="q-py-sm">
+        Virtual Cards
+        <q-icon
+          :name="matRefresh"
+          class="float-right"
+          size="sm"
+          @click="storeCards.refresh()"
+        />
+      </q-item-label>
 
-      <template v-for="(card, index) in cards" :key="card.index">
+      <template v-for="(card, index) in storeCards.virtualCards" :key="card.token">
         <q-separator v-if="0==index"/>
         <q-separator v-else spaced inset="item" />
 
-        <q-item
-        clickable
-        v-ripple
-        @click="prompt = true"
-        >
+        <q-item>
 
           <q-item-section avatar top>
             <q-avatar :icon="matCreditCard" color="primary" text-color="white" />
@@ -21,16 +25,25 @@
           <q-item-section>
             <q-item-label caption>
               <div>
-                Linked Payment Card
+                {{card.memo}} Virtual Card
+                <br/>
+                Expires: {{card.exp_month}}/{{card.exp_year}}
+                <br/>
+                Status: {{ card.state.charAt(0) + card.state.substring(1).toLowerCase() }}
                 <br/>
                 XXXX-XXXX-XXXX-{{card.last_four}}
               </div>
-              card data...
             </q-item-label>
           </q-item-section>
 
           <q-item-section side top>
-            <q-item-label caption>${{(card.limit/100).toFixed(2)}}</q-item-label>
+            <q-item-label caption>
+              ${{(card.spend_limit/100).toFixed(2)}}
+              <br/>
+              <q-btn @click="prompt = true" >
+                <q-icon :name="matEdit" color="blue" />
+              </q-btn>
+            </q-item-label>
           </q-item-section>
 
         </q-item>
@@ -52,14 +65,11 @@
 </template>
 
 <script setup lang="ts">
-import { matCreditCard } from '@quasar/extras/material-icons';
+import { matCreditCard, matRefresh, matEdit } from '@quasar/extras/material-icons';
 import { ref } from 'vue';
+import { useVirtualCards } from '../stores/virtual-cards';
 
 const prompt = ref(false);
-const cards = ref([
-  {id: 'a', last_four: '9876', name: 'Awesome Flix', plan: 'basic', limit: 100},
-  {id: 'b', last_four: '9871', name: 'Awesome Flix1', plan: 'HD', limit: 900},
-  {id: 'c', last_four: '9872', name: 'Awesome Flix2', plan: '4K', limit: 1400},
-  {id: 'd', last_four: '9873', name: 'Awesome Flix3', plan: 'Family', limit: 10000},
-])
+const storeCards = useVirtualCards();
+
 </script>
