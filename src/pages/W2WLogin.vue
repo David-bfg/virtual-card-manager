@@ -43,7 +43,7 @@ import meteorServerSock from '../assets/typescript/meteor-sock';
 const username = ref('');
 const password = ref('');
 
-let what2watchlistToken = 'w2w-token';
+const what2watchlistToken = 'w2w-token';
 
 const loggedIn = ref(false);
 const isLoading = ref(false);
