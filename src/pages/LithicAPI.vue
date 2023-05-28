@@ -1,7 +1,7 @@
 <template>
   <q-page class="row items-center justify-evenly">
 
-    <q-form @submit="getCards">
+    <q-form @submit="getTransactions">
           <q-input
             filled
             v-model.lazy="apiKey"
@@ -11,6 +11,13 @@
             :rules="[ val => !!val || 'Please enter your API-Key' ]"
           />
     </q-form>
+
+    <q-table
+      :rows="transactions"
+      row-key="name"
+      flat bordered
+    />
+
   </q-page>
 
 </template>
@@ -22,8 +29,9 @@ import { api } from 'boot/axios'
 const apiKeyToken = 'lithic-key-token';
 // const account_token = env.account_token;
 const apiKey = ref(localStorage.getItem(apiKeyToken) || '');
+const transactions = ref([]);
 
-function getCards() {
+function getTransactions() {
   const options = {
     method: 'GET',
     url: '/lithic/transactions',
@@ -48,6 +56,10 @@ function getCards() {
     .catch(function (error) {
       console.error(error);
     });
+}
+
+if(apiKey.value.length){
+  getTransactions();
 }
 
 </script>
