@@ -24,26 +24,18 @@
 
           <q-item-section>
             <q-item-label caption>
-              <div>
-                {{card.memo}} Virtual Card
-                <br/>
-                Expires: {{card.exp_month}}/{{card.exp_year}}
-                <br/>
-                Status: {{ card.state.charAt(0) + card.state.substring(1).toLowerCase() }}
-                <br/>
-                XXXX-XXXX-XXXX-{{card.last_four}}
-              </div>
+              <CardInfo :card="card" />
             </q-item-label>
           </q-item-section>
 
           <q-item-section side top>
             <q-item-label caption>
               ${{(card.spend_limit/100).toFixed(2)}}
-              <br/>
-              <q-btn @click="prompt = true" >
-                <q-icon :name="matEdit" color="blue" />
-              </q-btn>
             </q-item-label>
+            <br>
+            <q-btn @click="selCard(card.token); prompt = true" class="vertical-bottom">
+              <q-icon :name="matEdit" color="blue" />
+            </q-btn>
           </q-item-section>
 
         </q-item>
@@ -52,13 +44,7 @@
     </q-list>
 
     <q-dialog v-model="prompt">
-      <q-card style="min-width: 350px">
-
-        <q-card-actions align="right" class="text-primary">
-          <q-btn flat label="Cancel" v-close-popup />
-          <q-btn flat label="Apply" v-close-popup />
-        </q-card-actions>
-      </q-card>
+      <CardEditor v-if="prompt" :editingCardToken="editingCardToken"/>
     </q-dialog>
 
   </q-page>
@@ -66,10 +52,17 @@
 
 <script setup lang="ts">
 import { matCreditCard, matRefresh, matEdit } from '@quasar/extras/material-icons';
+import CardInfo from 'src/components/CardInfo.vue';
+import CardEditor from 'src/components/CardEditor.vue';
 import { ref } from 'vue';
 import { useVirtualCards } from '../stores/virtual-cards';
 
 const prompt = ref(false);
 const storeCards = useVirtualCards();
+const editingCardToken = ref<string | null>(null);
+
+function selCard(token: string) {
+  editingCardToken.value = token;
+}
 
 </script>

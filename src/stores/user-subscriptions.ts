@@ -2,11 +2,12 @@ import { ref } from 'vue';
 import { defineStore } from 'pinia';
 import meteorServerSock from '../assets/typescript/meteor-sock';
 
-interface sub {
+export interface sub {
   logo: string;
   service_name: string;
   plan?: string;
   price: number;
+  period: string;
   service_id: string;
   card?: boolean;
 }
