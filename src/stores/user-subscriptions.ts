@@ -19,7 +19,7 @@ export interface subLink {
 export const useUserSubscriptions = defineStore('user-subscriptions', () => {
   const userSubscriptions = ref<Array<sub>>([]);
   // TODO: load on startup and persist data
-  const subLinksToVirtualCards = ref(new Map<string, subLink>());
+  const subLinksToVirtualCards = ref<{ [key: string]: subLink; }>({});
   // TODO: calculate on startup
   const cardToSub = new Map<string, sub>();
 
@@ -28,14 +28,14 @@ export const useUserSubscriptions = defineStore('user-subscriptions', () => {
       userSubscriptions.value = await meteorServerSock.call('subscription.details');
       userSubscriptions.value.forEach(sub => {
         const id = 'w2w:' + sub.service_id;
-        const value = subLinksToVirtualCards.value.get(id);
+        const value = subLinksToVirtualCards.value[id];
         if(value){
           value.sub = sub;
           if(value.cardToken){
             cardToSub.set(value.cardToken, sub);
           }
         } else {
-          subLinksToVirtualCards.value.set(id, {sub: sub});
+          subLinksToVirtualCards.value[id] = {sub: sub};
         }
       });
     } else {
@@ -48,8 +48,9 @@ export const useUserSubscriptions = defineStore('user-subscriptions', () => {
   }
 
   function setSubLink(service_id: string, cardToken: string) {
+    // TODO: wipe any old card link reference
     const id = 'w2w:' + service_id;
-    const subLnk = subLinksToVirtualCards.value.get(id);
+    const subLnk = subLinksToVirtualCards.value[id];
     if(subLnk){
       subLnk.cardToken = cardToken;
       cardToSub.set(cardToken, subLnk.sub);
@@ -59,7 +60,7 @@ export const useUserSubscriptions = defineStore('user-subscriptions', () => {
   }
 
   function getLinkedCardToken(service_id: string) {
-    return subLinksToVirtualCards.value.get('w2w:' + service_id)?.cardToken;
+    return subLinksToVirtualCards.value['w2w:' + service_id]?.cardToken;
   }
 
   return {
@@ -73,10 +74,6 @@ export const useUserSubscriptions = defineStore('user-subscriptions', () => {
 },
 {
   persist: {
-    afterRestore: (ctx) => {
-      ctx.store.subLinksToVirtualCards = new Map<string, subLink>(
-          Object.entries(ctx.store.subLinksToVirtualCards));
-    },
     paths: ['subLinksToVirtualCards'],
   },
 },
