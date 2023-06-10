@@ -27,10 +27,7 @@
             <q-item-label>{{sub.service_name}}</q-item-label>
             <q-item-label caption>
               {{sub.plan}} plan
-              <CardInfo
-                v-if="storeSubscriptions.getLinkedCardToken(sub.service_id)"
-                :card="getCard(sub.service_id)"
-              />
+              <CardInfo v-if="getCard(sub.service_id)" :card="getCard(sub.service_id)" />
               <p v-else>
                 Needs linked card to manage service payments.
               </p>
@@ -110,7 +107,10 @@
 
         <q-card-actions align="right" class="text-primary">
           <q-btn flat label="Cancel" v-close-popup />
-          <q-btn flat label="Link Card" @click=";" v-close-popup />
+          <q-btn flat label="Link Card" v-close-popup
+            @click="storeSubscriptions.setSubLink(activeSub?.service_id ,selectCard)"
+            :disable="!selectCard"
+          />
         </q-card-actions>
       </q-card>
       
@@ -162,7 +162,7 @@ watch(prompt, (newPrompt) => {
 
 function getCard(service_id: string){
   const cardToken = storeSubscriptions.getLinkedCardToken(service_id);
-  return storeCards.getCard(cardToken);
+  return cardToken && storeCards.getCard(cardToken);
 }
 </script>
 
