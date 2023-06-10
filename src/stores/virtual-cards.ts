@@ -1,6 +1,9 @@
 import { ref } from 'vue';
 import { defineStore } from 'pinia';
+import { useUserSubscriptions } from '../stores/user-subscriptions';
 import { api } from 'boot/axios';
+
+const storeSubscriptions = useUserSubscriptions();
 
 interface card {
   token: string;
@@ -44,7 +47,8 @@ export const useVirtualCards = defineStore('virtual-cards', () => {
       api
         .request(options)
         .then(function (response) {
-          virtualCards.value = response.data.data;
+          virtualCards.value = response.data.data.filter((card) =>
+              ['OPEN', 'PAUSED', 'CLOSED', 'PENDING_ACTIVATION', 'PENDING_FULFILLMENT'].includes(card.state));
           // TODO: add case for multiple pages.
           mapCards.clear();
           virtualCards.value.forEach((card, i) => mapCards.set(card.token, i))
@@ -91,13 +95,13 @@ export const useVirtualCards = defineStore('virtual-cards', () => {
     }
   }
 
-  async function addCard(spend_limit_duration: string, spend_limit: number, memo: string, state: string) {
+  async function addCard(spend_limit_duration: string, spend_limit: number, memo: string, state: string, service_id: string) {
     const apiKey = localStorage.getItem(apiKeyToken) || '';
 
     if(apiKey.length){
       const options = {
         method: 'POST',
-        url: '/lithic/cards/',
+        url: '/lithic/cards',
         headers: {
           accept: 'application/json',
           'content-type': 'application/json',
@@ -117,6 +121,7 @@ export const useVirtualCards = defineStore('virtual-cards', () => {
         .then(function (response) {
           virtualCards.value.push(response.data);
           mapCards.set(response.data.token, virtualCards.value.length-1);
+          storeSubscriptions.setSubLink(service_id, response.data.token)
         })
         .catch(function (error) {
           console.error(error);
