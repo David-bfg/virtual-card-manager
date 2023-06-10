@@ -78,6 +78,7 @@ const props = defineProps<{
   spend_limit: string,
   spend_limit_duration: string,
   }
+  service_id?: string
 }>()
 
 const storeCards = useVirtualCards();
@@ -103,8 +104,11 @@ function resetCardValues(){
           calcTax(val/100) : (val/100).toFixed(2)) : val;
     });
   } else {
-    Object.keys(props.cardDefaults).forEach(key => cardEdits[key] =
-        props.cardDefaults[key]);
+    // TODO: revisit once user has default tax property
+    Object.keys(props.cardDefaults).forEach(key => {
+      cardEdits[key] = key === 'spend_limit' ? (props.cardDefaults[key]/100
+          ).toFixed(2) : props.cardDefaults[key];
+    });
   }
   cardEdits.addTax = false;
 }
@@ -162,7 +166,8 @@ const CardStates = [
   {
     value: 'CLOSED',
     label: 'Closed',
-    disable: props.editingCardToken ? false : true,
+    // TODO: have a better way to close a card or explicitly say do it from lithic dashboard
+    disable: true,//props.editingCardToken ? false : true,
   }
 ];
 const CardStatesNameMap = {
@@ -203,8 +208,8 @@ function editCard() {
     storeCards.editCard(props.editingCardToken, cardEdits.spend_limit_duration,
         parseInt(cardEdits.spend_limit.replace('.','')), cardEdits.memo, cardEdits.state);
   } else {
-    storeCards.addCard(cardEdits.spend_limit_duration, cardEdits.spend_limit,
-        cardEdits.memo, cardEdits.state);
+    storeCards.addCard(cardEdits.spend_limit_duration, parseInt(cardEdits.spend_limit.replace('.','')),
+        cardEdits.memo, cardEdits.state, props.service_id);
   }
 }
 

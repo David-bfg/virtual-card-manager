@@ -26,13 +26,11 @@
           <q-item-section>
             <q-item-label>{{sub.service_name}}</q-item-label>
             <q-item-label caption>
-              {{sub.plan}} plan  {{ sub.service_id }}
-              <CardInfo v-if="sub.card" :card="{TODO: 'add plumbing for linked card data'}" />
-              <div v-if="sub.card">
-                Linked Payment Card
-                <br/>
-                XXXX-XXXX-XXXX-0000
-              </div>
+              {{sub.plan}} plan
+              <CardInfo
+                v-if="storeSubscriptions.getLinkedCardToken(sub.service_id)"
+                :card="getCard(sub.service_id)"
+              />
               <p v-else>
                 Needs linked card to manage service payments.
               </p>
@@ -42,7 +40,7 @@
           <q-item-section side top>
             <q-item-label caption>${{(sub.price/100).toFixed(2)}}</q-item-label>
             <br/>
-            <q-btn @click="selectCard = null; prompt = true, activeSub=sub" >
+            <q-btn @click="prompt = true, activeSub=sub" >
               <q-icon v-if="sub.card" :name="matCreditCard" color="blue" />
               <q-icon v-else :name="matAdd" color="blue" />
             </q-btn>
@@ -71,11 +69,10 @@
             <q-item
               clickable
               v-ripple
-              :active="selectCard === card.token"
-              @click="selectCard = card.token"
               active-class="my-menu-link"
             >
               <q-item-section avatar top>
+                <q-radio v-model="selectCard" :val="card.token"/>
                 <q-avatar :icon="matCreditCard" color="primary" text-color="white" />
               </q-item-section>
 
@@ -98,13 +95,13 @@
           <q-item
             clickable
             v-ripple
-            @click="selectCard = null;"
+            @click="selectCard = null; addCard = true"
           >
             <q-item-section avatar top>
               <q-avatar :icon="matAdd" color="primary" text-color="white" />
             </q-item-section>
 
-            <q-item-section @click="addCard = true">
+            <q-item-section>
               <q-item-label>Create New Card</q-item-label>
             </q-item-section>
 
@@ -117,7 +114,14 @@
         </q-card-actions>
       </q-card>
       
-      <CardEditor v-else :cardDefaults="{memo: activeSub?.service_name || '', spend_limit: ((activeSub?.price || 0)/100).toFixed(2), spend_limit_duration: activeSub?.period || ''}"/>
+      <CardEditor v-else
+        :service_id="activeSub?.service_id"
+        :cardDefaults="{
+          memo: activeSub?.service_name || '',
+          spend_limit: activeSub?.price || 0,
+          spend_limit_duration: activeSub?.period || ''
+        }"
+      />
     </q-dialog>
 
   </q-page>
@@ -147,11 +151,19 @@ onMounted(() => {
 
 watch(prompt, (newPrompt) => {
   if(newPrompt){
+    if(!storeCards.virtualCards.length){
+      addCard.value = true;
+    }
     selectCard.value = null;
   } else {
-    addCard.value = false
+    addCard.value = false;
   }
 });
+
+function getCard(service_id: string){
+  const cardToken = storeSubscriptions.getLinkedCardToken(service_id);
+  return storeCards.getCard(cardToken);
+}
 </script>
 
 <style lang="sass">
