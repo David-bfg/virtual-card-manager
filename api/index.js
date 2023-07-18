@@ -57,6 +57,6 @@ const hostedCard = (request, response) => {
   response.send({ displayURL, url, params: { embed_request, hmac } });
 };
 
-app.get('/embed/card', hostedCard);
+app.get('/lithic/embed/card', hostedCard);
 
 app.listen(port);
