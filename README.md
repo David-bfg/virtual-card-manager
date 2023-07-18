@@ -9,40 +9,8 @@ Allows a web service to suggest best available services and let the user manage 
 
 Built for What2Watchlist but capable of extending to other services.
 
-## Install the dependencies
+## Install and run app
 ```bash
-yarn
-# or
-npm install
+  npm install
+  npm run dev
 ```
-
-### Start the app in development mode (hot-code reloading, error reporting, etc.)
-```bash
-quasar dev
-```
-
-
-### Lint the files
-```bash
-yarn lint
-# or
-npm run lint
-```
-
-
-### Format the files
-```bash
-yarn format
-# or
-npm run format
-```
-
-
-
-### Build the app for production
-```bash
-quasar build
-```
-
-### Customize the configuration
-See [Configuring quasar.config.js](https://v2.quasar.dev/quasar-cli-vite/quasar-config-js).

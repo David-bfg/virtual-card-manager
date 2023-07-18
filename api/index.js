@@ -1,7 +1,7 @@
-const express = require('express');
-const CryptoJS = require('crypto-js');
-const { createProxyMiddleware } = require('http-proxy-middleware');
-const cors = require('cors');
+import express from 'express';
+import CryptoJS from 'crypto-js';
+import { createProxyMiddleware } from 'http-proxy-middleware';
+import cors from 'cors';
 
 const app = express();
 const port = 3069;
@@ -35,8 +35,8 @@ app.use('/lithic', (req, res, next) => {
 
 // TODO: see if this belongs in browser.
 // Learn why this is necessary at https://docs.lithic.com/pci-compliance.html
-const hostedCard = (request, response) => {
-  const { headers, query } = request;
+const hostedCard = (req, res) => {
+  const { headers, query } = req;
   const { card_token } = query;
   const embed_request_json = JSON.stringify({
     // css: `${process.env.VUE_APP_API}/embedded.css`,
@@ -48,13 +48,13 @@ const hostedCard = (request, response) => {
     headers.authorization && headers.authorization.replace('api-key ', '');
   const embed_request = Buffer.from(embed_request_json).toString('base64');
   const hmac = CryptoJS.enc.Base64.stringify(
-    CryptoJS.HmacSHA256(embed_request_json, passedApiKey)
+    CryptoJS.HmacSHA256(embed_request_json, String(passedApiKey))
   );
 
   const displayURL = `${apiBaseURL}/v1/embed/card`;
   const url = `${displayURL}?embed_request=${embed_request}&hmac=${hmac}`;
 
-  response.send({ displayURL, url, params: { embed_request, hmac } });
+  res.send({ displayURL, url, params: { embed_request, hmac } });
 };
 
 app.get('/lithic/embed/card', hostedCard);

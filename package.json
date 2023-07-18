@@ -1,52 +1,41 @@
 {
   "name": "lithic-card-manager",
-  "version": "0.0.1",
+  "private": true,
+  "version": "0.0.0",
   "description": "App to controll subscriptions using lithic virtual cards and connect with data from apps that rate or manage subscription services. Made to be a companion for What2Watchlist.com.",
   "productName": "Sub-Troll",
   "author": "david-bfg <david.1.bfg@gmail.com>",
-  "private": true,
+  "type": "module",
   "scripts": {
-    "lint": "eslint --ext .js,.ts,.vue ./",
-    "format": "prettier --write \"**/*.{js,ts,vue,scss,html,md,json}\" --ignore-path .gitignore",
-    "test": "echo \"No test specified\" && exit 0",
-    "start": "npm-run-all -p dev server:api",
-    "dev": "quasar dev",
+    "dev": "npm-run-all -p server:web server:api",
+    "server:web": "vite",
     "server:api": "node api/index.js",
-    "build": "quasar build"
+    "build": "tsc && vite build",
+    "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview"
   },
   "dependencies": {
-    "@quasar/extras": "^1.0.0",
     "axios": "^1.4.0",
     "cors": "^2.8.5",
     "crypto-js": "^4.1.1",
     "express": "^4.18.2",
     "http-proxy-middleware": "^2.0.6",
-    "isomorphic-ws": "^5.0.0",
     "npm-run-all": "^4.1.5",
-    "pinia": "^2.0.11",
-    "pinia-plugin-persistedstate": "^3.1.0",
-    "quasar": "^2.6.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "simpleddp": "^2.2.4",
-    "simpleddp-plugin-login": "^4.0.2",
-    "vue": "^3.0.0",
-    "vue-router": "^4.0.0"
+    "simpleddp-plugin-login": "^4.0.2"
   },
   "devDependencies": {
-    "@quasar/app-vite": "^1.0.0",
-    "@types/node": "^12.20.21",
-    "@types/simpleddp": "^2.2.1",
-    "@typescript-eslint/eslint-plugin": "^5.10.0",
-    "@typescript-eslint/parser": "^5.10.0",
-    "autoprefixer": "^10.4.2",
-    "eslint": "^8.10.0",
-    "eslint-config-prettier": "^8.1.0",
-    "eslint-plugin-vue": "^9.0.0",
-    "prettier": "^2.5.1",
-    "typescript": "^4.5.4"
-  },
-  "engines": {
-    "node": "^18 || ^16 || ^14.19",
-    "npm": ">= 6.13.4",
-    "yarn": ">= 1.21.1"
+    "@types/react": "^18.2.14",
+    "@types/react-dom": "^18.2.6",
+    "@typescript-eslint/eslint-plugin": "^5.61.0",
+    "@typescript-eslint/parser": "^5.61.0",
+    "@vitejs/plugin-react-swc": "^3.3.2",
+    "eslint": "^8.44.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.1",
+    "typescript": "^5.1.6",
+    "vite": "^4.4.0"
   }
 }
