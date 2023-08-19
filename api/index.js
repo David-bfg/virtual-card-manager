@@ -8,7 +8,7 @@ const port = 3069;
 
 // Allow requests only from the localhost domain
 const corsOptions = {
-  origin: 'http://localhost:9000'
+  origin: 'http://localhost:5173'
 };
 
 app.use(cors(corsOptions));
