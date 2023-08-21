@@ -11,7 +11,6 @@ import {
   IonCardSubtitle,
   IonBadge,
 } from "@ionic/react";
-import { Link } from "react-router-dom";
 import { api } from "../assets/lib/axios";
 
 interface card {
@@ -54,17 +53,22 @@ function VirtualCards() {
       api
         .request(options)
         .then(function (response) {
-          setVirtualCards(
-            response.data.data.filter((card) =>
-              [
-                "OPEN",
-                "PAUSED",
-                "CLOSED",
-                "PENDING_ACTIVATION",
-                "PENDING_FULFILLMENT",
-              ].includes(card.state)
-            )
-          );
+          const data: card[] | undefined = response?.data?.data;
+          if (Array.isArray(data)) {
+            setVirtualCards(
+              data.filter((card) =>
+                [
+                  "OPEN",
+                  "PAUSED",
+                  "CLOSED",
+                  "PENDING_ACTIVATION",
+                  "PENDING_FULFILLMENT",
+                ].includes(card.state)
+              )
+            );
+          } else {
+            setVirtualCards([]);
+          }
           // TODO: add case for multiple pages.
           // mapCards.clear();
           // virtualCards.forEach((card, i) => mapCards.set(card.token, i));
@@ -89,9 +93,7 @@ function VirtualCards() {
       <IonCardHeader>
         <IonCardTitle>Virtual Cards</IonCardTitle>
         <IonCardSubtitle>
-          <Link to="/cards/edit/token">
-            Cards for limiting service charges and repeated billing policies
-          </Link>
+          Cards for limiting service charges and repeated billing policies
         </IonCardSubtitle>
       </IonCardHeader>
 
@@ -99,7 +101,11 @@ function VirtualCards() {
         <IonList>
           {virtualCards.map((card) => {
             return (
-              <IonItem key={card.token} detail="true" href="#">
+              <IonItem
+                key={card.token}
+                detail={true}
+                routerLink={"/cards/edit/" + card.token}
+              >
                 {/* <IonThumbnail slot="start">
                   <img alt="Service logo" src={sub.logo} />
                 </IonThumbnail> */}

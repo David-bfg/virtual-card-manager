@@ -21,6 +21,7 @@ export interface sub {
   price: number;
   period: string;
   service_id: string;
+  id?: string;
 }
 
 export interface subLink {
@@ -35,20 +36,25 @@ function Subscriptions() {
     if (meteorServerSock.userId) {
       meteorServerSock
         .call("subscription.details")
-        .then((ret) => ret && setUserSubscriptions(ret))
+        .then((ret) => {
+          if (Array.isArray(ret)) {
+            const userSubs = ret.map((sub: sub) => {
+              const id = "w2w:" + sub.service_id;
+              return { ...sub, id };
+              // const value = subLinksToVirtualCards[id];
+              // if (value) {
+              //   value.sub = sub;
+              //   if (value.cardToken) {
+              //     cardToSub.set(value.cardToken, sub);
+              //   }
+              // } else {
+              //   subLinksToVirtualCards.value[id] = { sub: sub };
+              // }
+            });
+            setUserSubscriptions(userSubs);
+          }
+        })
         .catch(console.error);
-      // userSubscriptions.value.forEach((sub) => {
-      //   const id = "w2w:" + sub.service_id;
-      //   const value = subLinksToVirtualCards.value[id];
-      //   if (value) {
-      //     value.sub = sub;
-      //     if (value.cardToken) {
-      //       cardToSub.set(value.cardToken, sub);
-      //     }
-      //   } else {
-      //     subLinksToVirtualCards.value[id] = { sub: sub };
-      //   }
-      // });
     }
   }, []);
 
@@ -65,7 +71,15 @@ function Subscriptions() {
         <IonList>
           {userSubscriptions.map((sub) => {
             return (
-              <IonItem key={sub.service_id} detail="true" href="#">
+              <IonItem
+                key={sub.service_id}
+                detail={true}
+                routerLink={
+                  sub.id
+                    ? "/subscriptions/card-add/" + sub.id
+                    : "/subscriptions/card-edit/:id"
+                }
+              >
                 <IonThumbnail slot="start">
                   <img alt="Service logo" src={sub.logo} />
                 </IonThumbnail>

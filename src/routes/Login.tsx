@@ -129,6 +129,7 @@ const Login = () => {
               onIonInput={onUserInput}
               ref={ionUserInputEl}
               disabled={loggedIn}
+              style={loggedIn ? { opacity: 0.1 } : undefined}
             ></IonInput>
           </IonItem>
 
@@ -139,8 +140,9 @@ const Login = () => {
               placeholder="pass"
               type="password"
               value={password}
-              onIonInput={(event) => setPassword(event.target.value)}
+              onIonInput={(event) => setPassword(event.target.value as string)}
               disabled={loggedIn}
+              style={loggedIn ? { opacity: 0.1 } : undefined}
             ></IonInput>
           </IonItem>
 
