@@ -12,25 +12,11 @@ import {
   IonBadge,
 } from "@ionic/react";
 import { api } from "../assets/lib/axios";
-
-interface card {
-  token: string;
-  last_four: string;
-  memo: string;
-  spend_limit: number;
-  spend_limit_duration: string;
-  exp_month: string;
-  exp_year: string;
-  state: string;
-  created: string;
-  funding: object;
-  type: string;
-  auth_rule_tokens: Array<string>;
-}
+import { Card } from "./card";
 
 function VirtualCards() {
   const apiKeyToken = "lithic-key-token";
-  const [virtualCards, setVirtualCards] = useState<card[]>([]);
+  const [virtualCards, setVirtualCards] = useState<Card[]>([]);
 
   function refresh() {
     const apiKey = localStorage.getItem(apiKeyToken) || "";
@@ -53,7 +39,7 @@ function VirtualCards() {
       api
         .request(options)
         .then(function (response) {
-          const data: card[] | undefined = response?.data?.data;
+          const data: Card[] | undefined = response?.data?.data;
           if (Array.isArray(data)) {
             setVirtualCards(
               data.filter((card) =>
