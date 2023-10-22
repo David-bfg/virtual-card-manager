@@ -22,6 +22,9 @@ import {
   IonMenu,
   IonMenuToggle,
   IonPage,
+  IonSelectOption,
+  IonItem,
+  IonSelect,
 } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
 
@@ -34,12 +37,18 @@ import {
   codeSlashOutline,
   settings,
   logIn,
+  logOut,
   informationCircle,
 } from "ionicons/icons";
+import { observer } from "mobx-react";
+import loginStore from "./store/LoginStore";
 
 setupIonicReact();
 
-function App() {
+const App = observer(() => {
+  const logout = () => {
+    loginStore.logout();
+  };
   return (
     <>
       <IonMenu contentId="main-content">
@@ -54,7 +63,26 @@ function App() {
                 ></IonIcon>
               </IonButton>
             </IonButtons>
-            <IonTitle>Service Login</IonTitle>
+            {Object.keys(loginStore.services).length === 1 ? (
+              <IonTitle>{loginStore.services["w2w"]?.service}</IonTitle>
+            ) : (
+              <IonItem>
+                <IonSelect
+                  label="Chose Servcie"
+                  labelPlacement="floating"
+                  interface="popover"
+                  value="w2w"
+                >
+                  {Object.keys(loginStore.services).map((key) => {
+                    return (
+                      <IonSelectOption key={key} value={key}>
+                        {loginStore.services[key].service}
+                      </IonSelectOption>
+                    );
+                  })}
+                </IonSelect>
+              </IonItem>
+            )}
           </IonToolbar>
         </IonHeader>
         <IonContent className="ion-padding">
@@ -65,12 +93,20 @@ function App() {
         <IonHeader>
           <IonToolbar color="primary">
             <IonButtons slot="start">
-              <IonMenuToggle>
-                <IonButton>
-                  <IonIcon slot="start" icon={logIn} size="large"></IonIcon>
-                  Login
+              {Object.keys(loginStore.services).length === 1 &&
+              loginStore.selectedService()?.loggedIn ? (
+                <IonButton onClick={logout}>
+                  <IonIcon slot="start" icon={logOut} size="large"></IonIcon>
+                  Logout
                 </IonButton>
-              </IonMenuToggle>
+              ) : (
+                <IonMenuToggle>
+                  <IonButton>
+                    <IonIcon slot="start" icon={logIn} size="large"></IonIcon>
+                    Login
+                  </IonButton>
+                </IonMenuToggle>
+              )}
             </IonButtons>
             <IonTitle>
               Sub-Troll <br /> Gain controll of your subscriptions
@@ -143,6 +179,6 @@ function App() {
       </IonPage>
     </>
   );
-}
+});
 
 export default App;

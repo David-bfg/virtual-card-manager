@@ -9,88 +9,25 @@ import {
   useIonAlert,
   useIonLoading,
 } from "@ionic/react";
-import { useHistory } from "react-router-dom";
+import { observer } from "mobx-react";
 import { logIn, logOut } from "ionicons/icons";
-import meteorServerSock from "../assets/lib/meteor-sock";
+import loginStore from "../store/LoginStore";
 
-const Login = () => {
-  const what2watchlistToken = "w2w-token";
-  let loginEvent: Event,
-    logoutEvent: Event,
-    loginSessionLostEvent: Event,
-    loginResumeEvent: Event;
-  const history = useHistory();
+const Login = observer(() => {
   const [alert] = useIonAlert();
   const [present, dismiss] = useIonLoading();
-  const [loggedIn, setLoggedIn] = useState(
-    !!(meteorServerSock.token && meteorServerSock.userId)
-  );
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  useEffect(() => {
-    loginEvent = meteorServerSock.on("login", () => {
-      setLoggedIn(true);
-      console.log("User logged in");
-    });
-
-    logoutEvent = meteorServerSock.on("logout", () => {
-      setLoggedIn(false);
-      console.log("User logged out");
-    });
-
-    loginSessionLostEvent = meteorServerSock.on("loginSessionLost", () => {
-      setLoggedIn(false);
-      console.log(
-        "User lost connection to server, will auto resume " +
-          "by default with token"
-      );
-    });
-
-    loginResumeEvent = meteorServerSock.on("loginResume", () => {
-      setLoggedIn(true);
-      console.log("User resumed (logged in by token)");
-    });
-
-    return () => {
-      loginEvent.stop();
-      logoutEvent.stop();
-      loginSessionLostEvent.stop();
-      loginResumeEvent.stop();
-    };
-  });
-
   const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (loggedIn) {
+    if (loginStore.selectedService()?.loggedIn) {
       present({ message: "Loading..." })
-        .then(() => meteorServerSock.logout())
-        .then(() => {
-          localStorage.removeItem(what2watchlistToken);
-        })
+        .then(() => loginStore.logout())
         .finally(() => dismiss());
     } else {
       present({ message: "Loading..." })
-        .then(() =>
-          meteorServerSock.login({
-            password: password,
-            user: {
-              username: username,
-            },
-          })
-        )
-        .then(
-          (userAuth: {
-            id: string;
-            token: string;
-            tokenExpires: Date;
-            type: string;
-          }) => {
-            if (userAuth) {
-              localStorage.setItem(what2watchlistToken, userAuth.token);
-            }
-          }
-        )
+        .then(() => loginStore.login(password, undefined, username))
         .catch((e: Error) => {
           console.error("Login failed.", e.message);
           alert({
@@ -128,8 +65,12 @@ const Login = () => {
               value={username}
               onIonInput={onUserInput}
               ref={ionUserInputEl}
-              disabled={loggedIn}
-              style={loggedIn ? { opacity: 0.1 } : undefined}
+              disabled={loginStore.selectedService().loggedIn}
+              style={
+                loginStore.selectedService().loggedIn
+                  ? { opacity: 0.1 }
+                  : undefined
+              }
             ></IonInput>
           </IonItem>
 
@@ -141,8 +82,12 @@ const Login = () => {
               type="password"
               value={password}
               onIonInput={(event) => setPassword(event.target.value as string)}
-              disabled={loggedIn}
-              style={loggedIn ? { opacity: 0.1 } : undefined}
+              disabled={loginStore.selectedService().loggedIn}
+              style={
+                loginStore.selectedService().loggedIn
+                  ? { opacity: 0.1 }
+                  : undefined
+              }
             ></IonInput>
           </IonItem>
 
@@ -151,16 +96,24 @@ const Login = () => {
               expand="full"
               type="submit"
               color="secondary"
-              disabled={!(loggedIn || (password.length && username.length))}
+              disabled={
+                !(
+                  loginStore.selectedService()?.loggedIn ||
+                  (password.length && username.length)
+                )
+              }
             >
-              <IonIcon icon={loggedIn ? logOut : logIn} slot="start" />
-              {loggedIn ? "Logout" : "Login"}
+              <IonIcon
+                icon={loginStore.selectedService().loggedIn ? logOut : logIn}
+                slot="start"
+              />
+              {loginStore.selectedService().loggedIn ? "Logout" : "Login"}
             </IonButton>
           </div>
         </form>
       </IonCardContent>
     </IonCard>
   );
-};
+});
 
 export default Login;
