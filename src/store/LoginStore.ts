@@ -1,13 +1,13 @@
 import { makeAutoObservable } from 'mobx';
-import { LoginService } from "../assets/logins/login"
-import { What2WatchlistLogin } from "../assets/logins/w2w"
+import { Account } from "../assets/accounts/account"
+import { What2WatchlistLogin } from "../assets/accounts/w2w"
 
-interface LoginServices {
-  [key: string]: LoginService;
+interface LoginAccounts {
+  [key: string]: Account;
 }
 
 class LoginStore {
-  services: LoginServices = {
+  services: LoginAccounts = {
     "w2w": What2WatchlistLogin.Instance,
   };
 

@@ -1,6 +1,6 @@
 import { makeAutoObservable, runInAction } from 'mobx';
 import meteorServerSock from "../lib/meteor-sock";
-import { LoginService } from "./login"
+import { Account } from "./account"
 
 const what2watchlistToken = "w2w-token";
 type UserAuth =  {
@@ -10,10 +10,10 @@ type UserAuth =  {
   type: string;
 }
 
-export class What2WatchlistLogin implements LoginService {
+export class What2WatchlistLogin implements Account {
   service = 'What 2 Watchlist';
   loggedIn = false;
-  private static _instance: LoginService;
+  private static _instance: Account;
 
   private constructor() {
     makeAutoObservable(this);
