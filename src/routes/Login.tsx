@@ -21,7 +21,7 @@ const Login = observer(() => {
 
   const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (loginStore.selectedService()?.loggedIn) {
+    if (loginStore.selectedAccount.loggedIn) {
       present({ message: "Loading..." })
         .then(() => loginStore.logout())
         .finally(() => dismiss());
@@ -30,7 +30,7 @@ const Login = observer(() => {
         .then(() => loginStore.login(password, undefined, username))
         .catch((e: Error) => {
           console.error("Login failed.", e.message);
-          alert({
+          void alert({
             header: "Login failed",
             message: e.reason,
             buttons: [{ text: "Ok" }],
@@ -65,9 +65,9 @@ const Login = observer(() => {
               value={username}
               onIonInput={onUserInput}
               ref={ionUserInputEl}
-              disabled={loginStore.selectedService().loggedIn}
+              disabled={loginStore.selectedAccount.loggedIn}
               style={
-                loginStore.selectedService().loggedIn
+                loginStore.selectedAccount.loggedIn
                   ? { opacity: 0.1 }
                   : undefined
               }
@@ -82,9 +82,9 @@ const Login = observer(() => {
               type="password"
               value={password}
               onIonInput={(event) => setPassword(event.target.value as string)}
-              disabled={loginStore.selectedService().loggedIn}
+              disabled={loginStore.selectedAccount.loggedIn}
               style={
-                loginStore.selectedService().loggedIn
+                loginStore.selectedAccount.loggedIn
                   ? { opacity: 0.1 }
                   : undefined
               }
@@ -98,16 +98,16 @@ const Login = observer(() => {
               color="secondary"
               disabled={
                 !(
-                  loginStore.selectedService()?.loggedIn ||
+                  loginStore.selectedAccount?.loggedIn ||
                   (password.length && username.length)
                 )
               }
             >
               <IonIcon
-                icon={loginStore.selectedService().loggedIn ? logOut : logIn}
+                icon={loginStore.selectedAccount.loggedIn ? logOut : logIn}
                 slot="start"
               />
-              {loginStore.selectedService().loggedIn ? "Logout" : "Login"}
+              {loginStore.selectedAccount.loggedIn ? "Logout" : "Login"}
             </IonButton>
           </div>
         </form>

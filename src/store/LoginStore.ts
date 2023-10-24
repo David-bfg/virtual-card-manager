@@ -7,38 +7,42 @@ interface LoginAccounts {
 }
 
 class LoginStore {
-  services: LoginAccounts = {
+  accounts: LoginAccounts = {
     "w2w": What2WatchlistLogin.Instance,
   };
 
-  selectedServiceId = "w2w";
+  private _selectedAccountId = "w2w";
 
   constructor() {
     makeAutoObservable(this);
   }
 
-  selectService = (serviceId: string) => {
-    if(this.services?.[serviceId]){
-      this.selectedServiceId = serviceId;
+  public set selectAccount(accountId: string) {
+    if(this.accounts?.[accountId]){
+      this._selectedAccountId = accountId;
     }
-  };
+  }
 
-  selectedService = () => {
-    return this.services[this.selectedServiceId];
-  };
+  public get selectedAccount() {
+    return this.accounts[this._selectedAccountId];
+  }
+
+  public get selectedAccountId() {
+    return this._selectedAccountId;
+  }
 
   login = (password: string, email: string | undefined,
     username: string | undefined) => {
-    const service = this.selectedService();
-    if (service) {
-      return service.login(password, email, username);
+    const account = this.selectedAccount;
+    if (account) {
+      return account.login(password, email, username);
     }
   }
 
   logout = () => {
-    const service = this.selectedService();
-    if (service) {
-      return service.logout();
+    const account = this.selectedAccount;
+    if (account) {
+      return account.logout();
     }
   }
 }

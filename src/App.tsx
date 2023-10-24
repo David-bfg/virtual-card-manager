@@ -47,7 +47,12 @@ setupIonicReact();
 
 const App = observer(() => {
   const logout = () => {
-    loginStore.logout();
+    const p = loginStore.logout();
+    if (p instanceof Promise) {
+      p.catch(() => {
+        //no-op lint suppress
+      });
+    }
   };
   return (
     <>
@@ -63,8 +68,8 @@ const App = observer(() => {
                 ></IonIcon>
               </IonButton>
             </IonButtons>
-            {Object.keys(loginStore.services).length === 1 ? (
-              <IonTitle>{loginStore.services["w2w"]?.service}</IonTitle>
+            {Object.keys(loginStore.accounts).length === 1 ? (
+              <IonTitle>{loginStore.selectedAccount.service}</IonTitle>
             ) : (
               <IonItem>
                 <IonSelect
@@ -73,10 +78,10 @@ const App = observer(() => {
                   interface="popover"
                   value="w2w"
                 >
-                  {Object.keys(loginStore.services).map((key) => {
+                  {Object.keys(loginStore.accounts).map((key) => {
                     return (
                       <IonSelectOption key={key} value={key}>
-                        {loginStore.services[key].service}
+                        {loginStore.accounts[key].service}
                       </IonSelectOption>
                     );
                   })}
@@ -93,8 +98,8 @@ const App = observer(() => {
         <IonHeader>
           <IonToolbar color="primary">
             <IonButtons slot="start">
-              {Object.keys(loginStore.services).length === 1 &&
-              loginStore.selectedService()?.loggedIn ? (
+              {Object.keys(loginStore.accounts).length === 1 &&
+              loginStore.selectedAccount.loggedIn ? (
                 <IonButton onClick={logout}>
                   <IonIcon slot="start" icon={logOut} size="large"></IonIcon>
                   Logout
