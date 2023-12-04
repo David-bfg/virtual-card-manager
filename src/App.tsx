@@ -28,11 +28,11 @@ import {
 } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
 
+import { useEffect } from "react";
 import { Route, Redirect } from "react-router";
 
 import {
   cardOutline,
-  logInOutline,
   walletOutline,
   codeSlashOutline,
   settings,
@@ -40,7 +40,9 @@ import {
   logOut,
   informationCircle,
 } from "ionicons/icons";
+import { menuController } from "@ionic/core/components";
 import { observer } from "mobx-react";
+import { autorun } from "mobx";
 import loginStore from "./store/LoginStore";
 
 setupIonicReact();
@@ -54,6 +56,20 @@ const App = observer(() => {
       });
     }
   };
+  useEffect(() => {
+    const disposer = autorun(
+      () => {
+        if (loginStore.selectedAccount.loggedIn) {
+          void menuController.close("start");
+        } else {
+          void menuController.open("start");
+        }
+      },
+      { delay: 500 }
+    );
+
+    return () => disposer();
+  }, []);
   return (
     <>
       <IonMenu contentId="main-content">
@@ -127,13 +143,12 @@ const App = observer(() => {
           <IonReactRouter>
             <IonTabs>
               <IonRouterOutlet>
-                <Redirect exact path="/" to="/login" />
+                <Redirect exact path="/" to="/subscriptions" />
                 {/*
                   Use the render method to reduce the number of renders your component will have due to a route change.
 
                   Use the component prop when your component depends on the RouterComponentProps passed in automatically.
                 */}
-                <Route path="/login" render={() => <Login />} exact={true} />
                 <Route
                   path="/subscriptions"
                   render={() => <Subscriptions />}
@@ -161,10 +176,6 @@ const App = observer(() => {
               </IonRouterOutlet>
 
               <IonTabBar slot="bottom">
-                <IonTabButton tab="login" href="/login">
-                  <IonIcon icon={logInOutline} />
-                  <IonLabel>Login</IonLabel>
-                </IonTabButton>
                 <IonTabButton tab="subscriptions" href="/subscriptions">
                   <IonIcon icon={walletOutline} />
                   <IonLabel>Subscriptions</IonLabel>
