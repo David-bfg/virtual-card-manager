@@ -15,6 +15,7 @@ import {
   IonTabBar,
   IonTabButton,
   IonIcon,
+  useIonAlert,
   IonLabel,
   IonRouterOutlet,
   IonButtons,
@@ -48,12 +49,12 @@ import loginStore from "./store/LoginStore";
 setupIonicReact();
 
 const App = observer(() => {
+  const [loginAlert] = useIonAlert();
+
   const logout = () => {
     const p = loginStore.logout();
     if (p instanceof Promise) {
-      p.catch(() => {
-        //no-op lint suppress
-      });
+      p.catch(console.error);
     }
   };
   useEffect(() => {
@@ -68,7 +69,23 @@ const App = observer(() => {
       { delay: 500 }
     );
 
-    return () => disposer();
+    const menuCloseListener = () => {
+      if (!loginStore.selectedAccount.loggedIn) {
+        void menuController.open("start");
+        loginAlert({
+          header: "Login Needed",
+          message: "Please login to use this app.",
+          buttons: ["OK"],
+        }).catch(console.error);
+      }
+    };
+
+    document.addEventListener("ionDidClose", menuCloseListener);
+
+    return () => {
+      disposer();
+      document.removeEventListener("ionDidClose", menuCloseListener);
+    };
   }, []);
   return (
     <>
