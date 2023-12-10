@@ -5,6 +5,7 @@ import {
   IonCardContent,
   IonThumbnail,
   IonList,
+  IonIcon,
   IonItem,
   IonLabel,
   IonCardHeader,
@@ -12,7 +13,11 @@ import {
   IonCardSubtitle,
   IonBadge,
 } from "@ionic/react";
-import meteorServerSock from "../assets/lib/meteor-sock";
+import { observer } from "mobx-react";
+import { autorun } from "mobx";
+import loginStore from "../store/LoginStore";
+import subscriptionStore from "../store/SubscriptionStore";
+import { refresh } from "ionicons/icons";
 
 export interface sub {
   logo: string;
@@ -29,34 +34,32 @@ export interface subLink {
   cardToken?: string;
 }
 
-function Subscriptions() {
+const Subscriptions = observer(() => {
   const [userSubscriptions, setUserSubscriptions] = useState<sub[]>([]);
 
   useEffect(() => {
-    if (meteorServerSock.userId) {
-      meteorServerSock
-        .call("subscription.details")
-        .then((ret) => {
-          if (Array.isArray(ret)) {
-            const userSubs = ret.map((sub: sub) => {
-              const id = "w2w:" + sub.service_id;
-              return { ...sub, id };
-              // const value = subLinksToVirtualCards[id];
-              // if (value) {
-              //   value.sub = sub;
-              //   if (value.cardToken) {
-              //     cardToSub.set(value.cardToken, sub);
-              //   }
-              // } else {
-              //   subLinksToVirtualCards.value[id] = { sub: sub };
-              // }
-            });
-            setUserSubscriptions(userSubs);
-          }
-        })
-        .catch(console.error);
-    }
+    const disposer = autorun(
+      () => {
+        if (loginStore.selectedAccount.loggedIn) {
+          refreshSubs();
+        }
+      },
+      // Fixes doublerun. Imagine to be related to nested
+      // makeAutoObservable objects.
+      { delay: 15 }
+    );
+
+    return () => disposer();
   }, []);
+
+  const refreshSubs = () => {
+    subscriptionStore
+      .refresh(loginStore.selectedAccountId)
+      .then(() => {
+        setUserSubscriptions(subscriptionStore.accountActiveSubscriptions);
+      })
+      .catch(console.error);
+  };
 
   return (
     <IonCard>
@@ -98,15 +101,13 @@ function Subscriptions() {
             );
           })}
         </IonList>
-        <IonButton fill="clear" style={{ float: "left" }}>
-          Action 1
-        </IonButton>
-        <IonButton fill="clear" style={{ float: "left" }}>
-          Action 2
+        <IonButton fill="clear" onClick={refreshSubs}>
+          <IonIcon icon={refresh}></IonIcon>
+          refresh
         </IonButton>
       </IonCardContent>
     </IonCard>
   );
-}
+});
 
 export default Subscriptions;
