@@ -25,7 +25,6 @@ function LithicAPI() {
       method: "GET",
       url: "/lithic/transactions",
       params: {
-        account_token: "1e7a5674-410c-4dbc-bf09-5fad51087f5a",
         page: "1",
         page_size: "50",
       },
@@ -47,9 +46,9 @@ function LithicAPI() {
         console.error(e);
         alert({
           header: "API access failed",
-          message: e.reason,
+          message: e.message,
           buttons: [{ text: "Ok" }],
-        });
+        }).catch(console.error);
       });
   };
 
