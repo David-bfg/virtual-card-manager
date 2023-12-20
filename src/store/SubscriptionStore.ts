@@ -99,7 +99,7 @@ class SubscriptionsStore {
     return this.cardToSub.get(token);
   }
 
-  setSubLink(
+  setSubCardLink(
     service_id: string,
     cardToken: string,
     accountId: string | undefined
